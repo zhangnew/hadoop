@@ -46,6 +46,7 @@ import java.net.InetSocketAddress;
 
 import static org.apache.hadoop.fs.CommonConfigurationKeys.DEFAULT_HADOOP_HTTP_STATIC_USER;
 import static org.apache.hadoop.fs.CommonConfigurationKeys.HADOOP_HTTP_STATIC_USER;
+import static org.apache.hadoop.fs.CommonConfigurationKeysPublic.HADOOP_HTTP_AUTHENTICATION_TYPE;
 
 @InterfaceAudience.Private
 public class JspHelper {
@@ -114,7 +115,7 @@ public class JspHelper {
     final String doAsUserFromQuery = request.getParameter(DoAsParam.NAME);
     final String remoteUser;
    
-    if (UserGroupInformation.isSecurityEnabled()) {
+    if (UserGroupInformation.isSecurityEnabled()&& !conf.get(HADOOP_HTTP_AUTHENTICATION_TYPE).equals("simple") ) {
       remoteUser = request.getRemoteUser();
       final String tokenString = request.getParameter(DELEGATION_PARAMETER_NAME);
       if (tokenString != null) {
