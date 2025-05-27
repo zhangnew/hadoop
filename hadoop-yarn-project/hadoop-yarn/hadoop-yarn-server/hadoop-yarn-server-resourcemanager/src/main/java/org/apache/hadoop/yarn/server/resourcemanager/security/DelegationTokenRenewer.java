@@ -989,12 +989,20 @@ public class DelegationTokenRenewer extends AbstractService {
     @Override
     public void run() {
       while (true) {
+        try {
+          Thread.sleep(1000);
+          LOG.info("futures.size={}", futures.size());
+        } catch (InterruptedException e) {
+          LOG.error("DelegationTokenRenewerPoolTracker thread interrupted", e);
+        }
         for (Map.Entry<DelegationTokenRenewerEvent, Future<?>> entry : futures
             .entrySet()) {
           DelegationTokenRenewerEvent evt = entry.getKey();
           Future<?> future = entry.getValue();
           try {
+            LOG.info("Retrying token renewer thread {} ms, futures.size={}", tokenRenewerThreadTimeout, futures.size());
             future.get(tokenRenewerThreadTimeout, TimeUnit.MILLISECONDS);
+            Thread.sleep(1000);
           } catch (TimeoutException e) {
 
             // Cancel thread and retry the same event in case of timeout
